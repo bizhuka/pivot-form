@@ -45,20 +45,14 @@
     <v-row v-for="(item, index) in columns" :key="index">
       <v-col cols="12">
         <v-textarea :label="item.columnName + ' - ' + item.header" filled v-model="item.value" rows="1" auto-grow
-          density="compact"
-          :prepend-icon="index > 0 ? 'mdi-arrow-up' : '-'"
+          density="compact" :prepend-icon="index > 0 ? 'mdi-arrow-up' : '-'"
           @click:prepend="index > 0 && handleMove(index, -1)"
-          
           :prepend-inner-icon="index > 1 ? 'mdi-arrow-collapse-up' : ''"
           @click:prepend-inner="index > 1 && handleMoveToTop(index)"
-
           :append-icon="index < columns.length - 1 ? 'mdi-arrow-down' : '-'"
           @click:append="index < columns.length - 1 && handleMove(index, 1)"
-
-          :append-inner-icon="item.value ? _currentClipboardText === item.value ? 'mdi-check': 'mdi-content-copy': ''"
-          @click:append-inner="copyToClipboard(item.value)"
-          
-          @input="onTextChange(index)"></v-textarea>
+          :append-inner-icon="item.value ? _currentClipboardText === item.value ? 'mdi-check' : 'mdi-content-copy' : ''"
+          @click:append-inner="copyToClipboard(item.value)" @input="onTextChange(index)"></v-textarea>
       </v-col>
     </v-row>
   </v-container>
@@ -289,19 +283,22 @@ export default {
       // Load again after sync
       const autoFilterRange1 = this._worksheet?.autoFilter?.getRange()
 
-      const header = autoFilterRange.values[0];
-      selectedFilter.filterData.forEach(async (filter) => {
-        const columnIndex = header.indexOf(filter.header);
-        if (columnIndex !== -1)
-          if (!filter.filters || filter.filters.length === 0)
-            this._worksheet.autoFilter.clearColumnCriteria(columnIndex)
-          else
-            this._worksheet.autoFilter.apply(autoFilterRange1, columnIndex, {
-              values: filter.filters,
-              operator: Excel.FilterOperator.and,
-              filterOn: Excel.FilterOn.values
-            });
-      });
+      const arrHeaders = autoFilterRange.values[0];
+      for (let columnIndex = 0; columnIndex < arrHeaders.length; columnIndex++) {
+        const header = arrHeaders[columnIndex] as String;
+
+        const filter = selectedFilter.filterData.find(filter => filter.header === header);
+        if (!filter || !filter.filters || filter.filters.length === 0) {
+          this._worksheet.autoFilter.clearColumnCriteria(columnIndex)
+          continue
+        }
+
+        this._worksheet.autoFilter.apply(autoFilterRange1, columnIndex, {
+          values: filter.filters,
+          operator: Excel.FilterOperator.and,
+          filterOn: Excel.FilterOn.values
+        });
+      }
 
       await this._context.sync();
     },
