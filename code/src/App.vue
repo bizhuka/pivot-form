@@ -134,8 +134,6 @@ export default {
     // if (autofitString === 'false')
     //   this.autofit = false;
 
-    // Office.onReady(async (info) => {
-    //   if (info.host === Office.HostType.Excel) {
     await Excel.run(async (context: Excel.RequestContext) => {
       this._context = context;
       this._workbook = context.workbook.load(["name"]);
@@ -145,8 +143,6 @@ export default {
       // Add an event handler for the activated sheet event
       this._workbook.worksheets.onActivated.add(this.checkForAutoFilter.bind(this));
     });
-    //   }
-    // });
   },
 
   // watch: {
@@ -204,8 +200,11 @@ export default {
       this.filters = await db.filters
         .where('[workbookName+worksheetName]')
         .equals([this._workbook.name, this._worksheet.name])
-        .toArray();
+        .toArray()
+        // Newest filters first
+        .then(filters => filters.reverse());
 
+      // Add the default filter -> Show all
       this.filters.unshift({
         workbookName: '',
         worksheetName: '',
@@ -243,7 +242,9 @@ export default {
       const combinedData = headers.map((header, index) => ({
         header: String(header),
         filters: filterData[index] || []
-      }));
+      })
+      // Do not save empty filters
+      ).filter(item => item.filters.length > 0);
 
       const newFilter = {
         title: this.inputValue,
@@ -357,12 +358,13 @@ export default {
     },
 
     async getCurrentRow(address: string) {
-      const autoFilterRange = this._worksheet.autoFilter.getRange().load(["rowIndex"]);// TODO 00000000000000000000000000000000000000
+      const autoFilterRange = this._worksheet.autoFilter.getRange().load(["rowIndex"]);
       const currentSelectionRange = this._worksheet.getRange(address);
 
       const intersection = autoFilterRange.getIntersectionOrNullObject(currentSelectionRange).load(["rowIndex"]);
       await this._context.sync();
 
+      // Set new row if intersection is not null
       if (!intersection.isNullObject) {
         this.previousOkRow = intersection.rowIndex + 1
       }
@@ -395,6 +397,7 @@ export default {
       await this._context.sync();
 
       const rowValues = autoFilterRange.values[this.currentRow - autoFilterRange.rowIndex - 1]
+      // Transpose the row values to the columns in the task pane
       for (let i = 0; i < rowValues.length; i++) {
         this.columns[i].value = rowValues[this.columns[i].position]
       }
