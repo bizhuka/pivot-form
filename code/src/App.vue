@@ -44,13 +44,18 @@
 
     <v-row v-for="(item, index) in columns" :key="index">
       <v-col cols="12">
-        <v-textarea :label="item.columnName + ' - ' + item.header" filled v-model="item.value" rows="1" auto-grow
-          density="compact" :prepend-icon="index > 0 ? 'mdi-arrow-up' : '-'"
+        <v-textarea rows="1" auto-grow filled density="compact" :label="item.columnName + ' - ' + item.header"
+          v-model="item.value"
+          
+          :prepend-icon="index > 0 ? 'mdi-arrow-up' : '-'"
           @click:prepend="index > 0 && handleMove(index, -1)"
+          
           :prepend-inner-icon="index > 1 ? 'mdi-arrow-collapse-up' : ''"
           @click:prepend-inner="index > 1 && handleMoveToTop(index)"
+          
           :append-icon="index < columns.length - 1 ? 'mdi-arrow-down' : '-'"
           @click:append="index < columns.length - 1 && handleMove(index, 1)"
+          
           :append-inner-icon="item.value ? _currentClipboardText === item.value ? 'mdi-check' : 'mdi-content-copy' : ''"
           @click:append-inner="copyToClipboard(item.value)" @input="onTextChange(index)"></v-textarea>
       </v-col>
@@ -111,7 +116,7 @@ export default {
       currentRow: 0,
       previousOkRow: 0,
       // autofit: true,
-      _currentClipboardText: "",
+      _currentClipboardText: '',
 
       columns: [] as Column[],
 
@@ -173,11 +178,19 @@ export default {
 
     async copyToClipboard(text: string) {
       this._currentClipboardText = text;
-      await navigator.clipboard.writeText(text);
 
       setTimeout(() => {
         this._currentClipboardText = '';
       }, 1500);
+      
+      // Set the text to the clipboard
+      const input = document.createElement('input')
+      input.type = 'text'
+      input.value = text
+      document.body.appendChild(input)
+      input.select()
+      document.execCommand('copy')
+      input.remove()
     },
 
     async saveOrder() {
@@ -243,7 +256,7 @@ export default {
         header: String(header),
         filters: filterData[index] || []
       })
-      // Do not save empty filters
+        // Do not save empty filters
       ).filter(item => item.filters.length > 0);
 
       const newFilter = {

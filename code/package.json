@@ -11,7 +11,7 @@
     "type-check": "vue-tsc --build --force",
     "start": "office-addin-debugging start manifest.xml --dev-server vite --no-debug",
     "start:desktop": "office-addin-debugging start manifest.xml desktop --dev-server vite --no-debug",
-    "start:web": "office-addin-debugging start manifest.xml web --dev-server vite --document https://pepsico-my.sharepoint.com/:x:/r/personal/birzhan_moldabayev_contractor_pepsico_com/_layouts/15/Doc.aspx?sourcedoc=%7B3ED9202A-35AD-4183-A8B3-D2F31DCD15AA%7D&file=CR_List%20(2).xlsx&action=default&mobileredirect=true --no-debug",
+    "start:web": "office-addin-debugging start manifest.xml web --dev-server vite --document Place_URL_Here --no-debug",
     "stop": "office-addin-debugging stop manifest.xml",
     "manifest:validate": "office-addin-manifest validate manifest.xml",
     "manifest:update-guid": "office-addin-manifest modify manifest.xml --guid",
