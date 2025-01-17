@@ -10,7 +10,7 @@
   <HighResolutionIconUrl DefaultValue="https://bizhuka.github.io/pivot-form/assets/icon-128.png"/>
   <SupportUrl DefaultValue="https://github.com/bizhuka/pivot-form/issues"/>
   <AppDomains>
-    <AppDomain>AppDomain1</AppDomain>
+    <AppDomain>https://pepsico.sharepoint.com</AppDomain>
     <AppDomain>AppDomain2</AppDomain>
     <AppDomain>AppDomain3</AppDomain>
   </AppDomains>
